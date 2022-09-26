@@ -1,42 +1,7 @@
                                  cwdof
 
 cwdof is a simple utility to get the curent working directory of a given
-process in OpenBSD.
+process in OpenBSD.  Build with `make` install with `make install`.
 
-
-§ Files
-
-The files are the following.
-• ./README:         This file.
-• ./Makefile:       The makefile.
-• ./config.mk:      The setup for the makefile.
-• ./cwdof.c:        The source code of cwdof.
-• ./cwdof.1:        The manual page for cwdof.
-
-
-§ Instalation
-
-First, edit ./config.mk to match your local setup.
-
-Enter the following command to build cwdof.  This command creates the
-binary file ./cwdof.
-
-	make
-
-By default, cwdof is installed into the /usr/local prefix.  Enter the
-following command to install cwdof (if necessary as root).  This command
-installs the binary file ./cwdof into the ${PREFIX}/bin/ directory, and
-the manual file ./cwdof.1 into ${MANPREFIX}/man1/ directory.
-
-	make install
-
-
-§ Running cwdof
-
-cwdof(1) receives as single argument the pid (process ID) of a process,
-and prints to stdout the current working directory of this process.
-
-
-§ License
-
+License:
 This software is in public domain and is provided AS IS, with NO WARRANTY.

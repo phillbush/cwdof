@@ -1,60 +1,33 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
+
 #include <err.h>
-#include <ctype.h>
+#include <errno.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-#define LEN(x) (sizeof (x) / sizeof (x[0]))
-
-static char *cwdof(pid_t);
-static void usage(void);
-
-/* print current working directory of given pid */
 int
 main(int argc, char *argv[])
 {
+	size_t len;
 	pid_t pid;
 	const char *errstr;
-	char *path;
+	char path[PATH_MAX];
 
-	argc--;
-	argv++;
-
-	if (argc != 1)
-		usage();
-
-	pid = strtonum(*argv, 1, LLONG_MAX, &errstr);
-	if (!isdigit(**argv) || errstr != NULL)
-		errx(EXIT_FAILURE, "Improper pid");
-
-	if ((path = cwdof(pid)) == NULL)
-		err(EXIT_FAILURE, NULL);
-
-	printf("%s\n", path);
-
+	if (pledge("stdio ps", NULL) == -1)
+		err(1, "pledge");
+	if (argc != 2) {
+		(void)fprintf(stderr, "usage: %s pid\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+	pid = strtonum(argv[1], 1, LLONG_MAX, &errstr);
+	if (errstr != NULL)
+		errc(EXIT_FAILURE, EINVAL, "%s", argv[1]);
+	len = PATH_MAX;
+	if (sysctl((int []){CTL_KERN, KERN_PROC_CWD, pid}, 3, path, &len, NULL, 0) == -1)
+		err(1, "sysctl");
+	(void)printf("%s\n", path);
 	return EXIT_SUCCESS;
-}
-
-/* return current working directory of pid */
-static char *
-cwdof(pid_t pid)
-{
-	static char path[PATH_MAX];
-	size_t len = sizeof path;
-	int name[] = {CTL_KERN, KERN_PROC_CWD, pid};
-
-	if (sysctl(name, LEN(name), path, &len, NULL, 0) == -1)
-		return NULL;
-
-	return path;
-}
-
-/* show usage */
-static void
-usage(void)
-{
-	(void) fprintf(stderr, "usage: %s pid\n", getprogname());
-	exit(EXIT_FAILURE);
 }

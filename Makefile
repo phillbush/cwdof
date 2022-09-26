@@ -1,15 +1,17 @@
-include config.mk
+PROG = cwdof
+SRCS = cwdof.c
+OBJS = cwdof.o
 
-SRCS = ${PROG}.c
-OBJS = ${SRCS:.c=.o}
+PREFIX ?= /usr/local
+MANPREFIX ?= ${PREFIX}/man
 
 all: ${PROG}
 
 ${PROG}: ${OBJS}
-	${CC} -o $@ ${OBJS} ${LDFLAGS}
+	${CC} ${LDFLAGS} -o $@ ${OBJS}
 
 .c.o:
-	${CC} ${CFLAGS} -c $<
+	${CC} ${CFLAGS} ${CPPFLAGS} -c $<
 
 clean:
 	-rm ${OBJS} ${PROG}
